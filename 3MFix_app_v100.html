@@ -283,7 +283,7 @@ cursor:pointer;margin-top:10px;}
   <div class="hbar"></div>
   <div class="screen" id="screen">
     <div class="island"></div>
-    <div class="scroll">
+    <div class="scroll" id="scroller">
       <div class="hdr">
         <div class="logo"><span class="logo-name">3MFix</span><span class="logo-ver">v1.0.0</span></div>
         <div class="hbtn" id="settingsBtn">⚙</div>
@@ -810,6 +810,11 @@ function toggleOpt(key){
   if(rp&&rf&&rc)ra=true;
   opts={cp,rp,rf,rc,ra};
   renderToggles();
+  // Scroll to top — target both the inner scroll div and window for mobile
+  const scroller=document.getElementById("scroller");
+  if(scroller)scroller.scrollTo({top:0,behavior:"smooth"});
+  window.scrollTo({top:0,behavior:"smooth"});
+  document.documentElement.scrollTo({top:0,behavior:"smooth"});
 }
 
 document.querySelectorAll('.trow[data-key]').forEach(r=>{
@@ -914,9 +919,9 @@ async function handleFile(file){
     setLog('con2',[{t:'i',m:'Waiting…'}]); setProgress(0);
     opts={cp:false,rp:false,rf:false,rc:false,ra:false};
     const currentNozzle=getNozzle(printerS);
-    // Change Printer enabled when: 2+ printers exist, OR 1 printer exists but differs from current file
-    const cpEnabled = printers.length>=2
-      || (printers.length===1 && (printers[0].printerModel!==model || getNozzle(printers[0].settings)!==currentNozzle));
+    // Change Printer enabled only when at least 1 saved printer differs from the loaded file
+    const cpEnabled = printers.length>=1
+      && printers.some(p=>p.printerModel!==model || getNozzle(p.settings)!==currentNozzle);
     dis={
       cp: !cpEnabled,
       rp:false,
@@ -1066,7 +1071,7 @@ async function restoreFile(){
     const restoredPs=extracted?.printerSettings||{};
     const restoredModel=restoredPs.printer_model||'Unknown';
     const restoredNozzle=getNozzle(restoredPs);
-    const cpOk=printers.length>=2||(printers.length===1&&(printers[0].printerModel!==restoredModel||getNozzle(printers[0].settings)!==restoredNozzle));
+    const cpOk=printers.length>=1&&printers.some(p=>p.printerModel!==restoredModel||getNozzle(p.settings)!==restoredNozzle);
     dis={
       cp:!cpOk,
       rp:false,
