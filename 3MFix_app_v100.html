@@ -1347,6 +1347,11 @@ function setTheme(m){
 function setLang(l){
   lang=l; ls.set('3f-lang',l);
   applyLang();
+  // Re-render settings modal immediately if open
+  const settingsTitles=['Settings','Ajustes','Paramètres','Einstellungen'];
+  if($('overlay').classList.contains('show') && settingsTitles.includes($('mttl').textContent)){
+    showModal('settings');
+  }
 }
 function toggleBtnLabels(){
   btnLabels=!btnLabels;applyBtnLabels();
